@@ -1,18 +1,34 @@
-var http = require('http');
-var url = require('url');
-var querystring = require('querystring');
+var express = require('express');
 
+var app = express();
 
-var server = http.createServer(function(req, res) {
-    var params = querystring.parse(url.parse(req.url).query);
-    res.writeHead(200, {"Content-Type": "text/plain"});
-    if ('prenom' in params && 'nom' in params) {
-        res.write('Vous vous appelez ' + params['prenom'] + ' ' + params['nom']);
-    }
-    else {
-        res.write('Vous devez bien avoir un prénom et un nom, non ?');
-
-    }
-    res.end();
+app.get('/', function(req, res) {
+    res.setHeader('Content-Type', 'text/plain');
+    res.end('Vous êtes à l\'accueil, que puis-je pour vous ?');
 });
-server.listen(8080);
+
+app.get('/sous-sol', function(req, res) {
+    res.setHeader('Content-Type', 'text/plain');
+    res.end('Vous êtes dans la cave à vins, ces bouteilles sont à moi !');
+});
+
+app.get('/etage/:etagenum/chambre', function(req, res) {
+	int = req.params.etagenum;
+	if (isNaN(int) == false) {
+		res.render('chambre.ejs', {etage: req.params.etagenum});	
+	}else {
+		res.end('L\'URL n\'est pas bonne !');
+	}
+});
+
+app.get('/compter/:nombre', function(req, res) {
+    var noms = ['Robert', 'Jacques', 'David'];
+    res.render('page.ejs', {compteur: req.params.nombre, noms: noms});
+});
+
+app.use(function(req, res, next){
+    res.setHeader('Content-Type', 'text/plain');
+    res.status(404).send("page introuvable !!!");
+});
+
+app.listen(8080);
